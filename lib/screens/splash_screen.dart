@@ -12,6 +12,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final TextEditingController _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String _savedName = ''; // Сакталган атты сактоо үчүн өзгөрмө
 
   @override
   void initState() {
@@ -24,7 +25,12 @@ class _SplashScreenState extends State<SplashScreen> {
     final prefs = await SharedPreferences.getInstance();
     final savedName = prefs.getString('user_name') ?? '';
     if (savedName.isNotEmpty) {
-      _nameController.text = savedName; // Окулган атты Input'ка коюу
+      if (mounted) {
+        setState(() {
+          _savedName = savedName; // UI'ны жаңыртуу үчүн сактайбыз
+          _nameController.text = savedName; // Окулган атты Input'ка коюу
+        });
+      }
     }
   }
 
@@ -67,83 +73,143 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
+      backgroundColor: const Color(0xFFF9FAFB), // Ачык боз/ак фон
+      body: Stack(
+        children: [
+          // Фондогу суу белгилери (Тигүүчү машинаны окшоштуруу)
+          Positioned(
+            bottom: -20,
+            left: -20,
+            right: -20,
+            child: Opacity(
+              opacity: 0.10, // Бүдөмүк кылуу (Opacity)
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(25), // equivalent to about 0.1 opacity
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.factory_rounded,
-                      size: 80,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Кош келиңиз!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Кирүү үчүн атыңызды жазыңыз',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Аты-жөнү',
-                      prefixIcon: Icon(Icons.person_outline),
-                    ),
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _continue(),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Сураныч, атыңызды жазыңыз';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _continue,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text(
-                        'Баштоо', // Улантуу -> Баштоо деп өзгөртүлдү
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+                   Icon(Icons.precision_manufacturing, size: 250, color: Theme.of(context).colorScheme.primary),
+                   const SizedBox(width: 20),
+                   Icon(Icons.cut, size: 120, color: Theme.of(context).colorScheme.primary),
                 ],
               ),
             ),
           ),
-        ),
+          
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 48),
+                      // "Кош келиңиз" тексти
+                      const Text(
+                        'Кош келиңиз!',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // Түшүндүрмө текст
+                      Text(
+                        _savedName.isNotEmpty 
+                            ? '$_savedName акыркы колдонуучу' 
+                            : 'Сиз жаңы колдонуучусуз',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      
+                      // Аты-жөнүн киргизүүчү инпут (TextField)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(10), // 0.04 * 255
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextFormField(
+                          controller: _nameController,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF334155),
+                          ),
+                          decoration: InputDecoration(
+                            border: InputBorder.none, // Негизги бордерди жашыруу
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                            prefixIcon: Container(
+                              margin: const EdgeInsets.only(left: 12, right: 16, top: 8, bottom: 8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary.withAlpha(25), // Ачык көк фон
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.person,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _continue(),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Сураныч, атыңызды жазыңыз';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      
+                      // Баштоо баскычы
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56, // Баскычтын бийиктигин чоңойтуу
+                        child: ElevatedButton(
+                          onPressed: _continue,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16), // Бурчтарын көбүрөөк тегеректөө
+                            ),
+                            elevation: 0, // Дизайндагыдай көлөкөсүз
+                          ),
+                          child: const Text(
+                            'Баштоо',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 48), // Айрым боштуктар үчүн
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
