@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/order_model.dart';
 import '../db/database_helper.dart';
 import 'history_screen.dart';
-import 'report_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -16,62 +15,62 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  // Текст киргизүү үчүн контроллерлор (Text editing controllers)
   final _modelController = TextEditingController();
   final _cutController = TextEditingController();
   final _quantityController = TextEditingController();
   final _shipmentController = TextEditingController();
-  final _dateController = TextEditingController(); // Дата үчүн контроллер
+  final _dateController = TextEditingController();
 
-  String _furnituraType = 'Кнопка'; // Фурнитура түрү
+  String _furnituraType = 'Замок'; // Демейки фурнитура
   Color _selectedColor = Colors.black; // Тандалган түс
+  String _selectedColorName = 'Кара'; // Түстүн аталышы
 
-  // Палитра үчүн түстөрдүн тизмеси
-  final List<Color> _colors = [
-    Colors.black,
-    Colors.white,
-    Colors.grey,
-    Colors.brown,
-    Colors.red,
-    Colors.pink,
-    Colors.purple,
-    Colors.deepPurple,
-    Colors.indigo,
-    Colors.blue,
-    Colors.lightBlue,
-    Colors.cyan,
-    Colors.teal,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.yellow,
-    Colors.amber,
-    Colors.orange,
-    Colors.deepOrange,
+  // Түстөрдүн тизмеси (List of colors to pick from)
+  final List<Map<String, dynamic>> _colors = [
+    {'color': Colors.black, 'name': 'Кара'},
+    {'color': Colors.white, 'name': 'Ак'},
+    {'color': Colors.grey, 'name': 'Боз'},
+    {'color': Colors.red, 'name': 'Кызыл'},
+    {'color': Colors.blue, 'name': 'Көк'},
+    {'color': Colors.green, 'name': 'Жашыл'},
+    {'color': Colors.yellow, 'name': 'Сары'},
+    {'color': Colors.brown, 'name': 'Күрөң'},
   ];
 
-  // Түстү тандоо (Color Picker)
+  @override
+  void initState() {
+    super.initState();
+    // Демейки күндү коюу (Set default date)
+    final today = DateTime.now();
+    _dateController.text =
+        "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+  }
+
+  // Түс тандоо диалогун көрсөтүү (Show color picker dialog)
   void _showColorPicker() {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
-            'Түстү тандаңыз',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          title: const Text('Түстү тандаңыз'),
           content: Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: _colors.map((color) {
+            children: _colors.map((c) {
+              final color = c['color'] as Color;
+              final name = c['name'] as String;
               return GestureDetector(
                 onTap: () {
-                  setState(() => _selectedColor = color);
+                  setState(() {
+                    _selectedColor = color;
+                    _selectedColorName = name;
+                  });
                   Navigator.pop(context);
                 },
                 child: CircleAvatar(
                   backgroundColor: color,
                   radius: 18,
-                  // Тандалган түстө чек (галочка) көрсөтүлөт
                   child: _selectedColor == color
                       ? Icon(
                           Icons.check,
@@ -80,9 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               : Colors.white,
                           size: 20,
                         )
-                      : (color ==
-                                Colors
-                                    .white // Ак түс айырмаланып турушу үчүн
+                      : (color == Colors.white
                             ? Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
@@ -99,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Датаны тандоо (Date Picker)
+  // Датаны тандоо функциясы (Date picker function)
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -110,31 +107,31 @@ class _HomeScreenState extends State<HomeScreen> {
     if (picked != null) {
       setState(() {
         _dateController.text =
-            "${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}";
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
   }
 
-  // Форманы тазалоо
+  // Форманы баштапкы абалга келтирүү (Clear the form)
   void _clearForm() {
-    _formKey.currentState?.reset();
     _modelController.clear();
     _cutController.clear();
     _quantityController.clear();
     _shipmentController.clear();
-    _dateController.clear();
     setState(() {
       _selectedColor = Colors.black;
-      _furnituraType = 'Кнопка';
+      _selectedColorName = 'Кара';
+      _furnituraType = 'Замок';
     });
   }
 
+  // Форманы маалымат базасына сактоо (Save form to local database)
   Future<void> _saveForm() async {
     if (_formKey.currentState!.validate()) {
       int cutCount = int.tryParse(_cutController.text) ?? 0;
       int pieceCount = int.tryParse(_quantityController.text) ?? 0;
 
-      // Эгер крой менен штук дал келбесе эскертүү диалогу
+      // Эгер крой менен штук дал келбесе, эскертүү берүү
       if (cutCount != pieceCount) {
         bool? proceed = await showDialog<bool>(
           context: context,
@@ -161,10 +158,9 @@ class _HomeScreenState extends State<HomeScreen> {
         if (proceed != true) return;
       }
 
-      // Түстүн кодун алуу #AARRGGBB
-      final colorHex = '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
+      final colorHex =
+          '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
 
-      // Буйрутма параметрин түзүү
       final order = OrderModel(
         userName: widget.userName,
         modelName: _modelController.text.trim(),
@@ -176,7 +172,6 @@ class _HomeScreenState extends State<HomeScreen> {
         cutDate: _dateController.text,
       );
 
-      // Маалымат базасына сактоо
       await DatabaseHelper.instance.insertOrder(order);
 
       if (!mounted) return;
@@ -186,19 +181,38 @@ class _HomeScreenState extends State<HomeScreen> {
             children: const [
               Icon(Icons.check_circle, color: Colors.white),
               SizedBox(width: 8),
-              Expanded(child: Text('Маалымат базага ийгиликтүү сакталды!')),
+              Expanded(child: Text('Буйрутма ийгиликтүү сакталды!')),
             ],
           ),
           backgroundColor: Colors.green.shade600,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
         ),
       );
 
       _clearForm();
     }
+  }
+
+  // Радио-баскычты түзүү боюнча жардамчы функция (Helper for radio options)
+  Widget _buildRadioOption(String title) {
+    return InkWell(
+      onTap: () => setState(() => _furnituraType = title),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<String>(
+            value: title,
+            // ignore: deprecated_member_use
+            groupValue: _furnituraType,
+            // ignore: deprecated_member_use
+            onChanged: (val) => setState(() => _furnituraType = val!),
+            activeColor: const Color(0xFF4A89DC),
+            visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+          ),
+          Text(title, style: const TextStyle(fontSize: 14)),
+        ],
+      ),
+    );
   }
 
   @override
@@ -207,317 +221,462 @@ class _HomeScreenState extends State<HomeScreen> {
     _cutController.dispose();
     _quantityController.dispose();
     _shipmentController.dispose();
-    _dateController.dispose(); // Контроллерди эстутумдан өчүрүү
+    _dateController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: const Color(0xFFF4F6F9), // Дизайндагы ачык боз фон
       appBar: AppBar(
-        title: const Text('Жаңы буйрутма'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: const Color(0xFF4A89DC), // Дизайндагы көк түс
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            // Эгер башкы бет болсо, артка кайтканда тиркемеден чыгып кетет же Splash экранга барат.
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          widget.userName,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
         centerTitle: true,
         actions: [
-          // Отчётко өтүү баскычы
           IconButton(
-            icon: const Icon(Icons.bar_chart),
-            tooltip: 'Отчёт жана Статистика',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ReportScreen()),
-              );
-            },
-          ),
-          // Тарыхчага өтүү баскычы
-          IconButton(
-            icon: const Icon(Icons.history_edu),
-            tooltip: 'Тарыхчага өтүү',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => HistoryScreen(userName: widget.userName)),
-              );
-            },
+            icon: const Icon(
+              Icons.account_circle,
+              color: Colors.white,
+              size: 28,
+            ),
+            onPressed: () {},
           ),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 4.0, bottom: 16.0),
-                child: Text(
-                  'Салам, ${widget.userName} 👋',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1. Биринчи блок: Модель аты, Канча крой, Түсү
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        // ignore: deprecated_member_use
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Модель маалыматы',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Модель аты',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _modelController,
+                        decoration: InputDecoration(
+                          hintText: 'A-102',
+                          hintStyle: TextStyle(color: Colors.grey.shade400),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF4A89DC),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _modelController,
-                          decoration: const InputDecoration(
-                            labelText: 'Кандай модель?',
-                            prefixIcon: Icon(Icons.checkroom),
+                        validator: (v) => v!.isEmpty ? 'Милдеттүү' : null,
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Канча крой',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Милдеттүү толтурулат'
-                              : null,
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
+                          SizedBox(
+                            width: 80,
+                            child: TextFormField(
+                              controller: _cutController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.right,
+                              decoration: const InputDecoration(
+                                hintText: '150',
+                                isDense: true,
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              validator: (v) => v!.isEmpty ? 'Жазыңыз' : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+                      InkWell(
+                        onTap: _showColorPicker,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _showColorPicker,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.palette_outlined,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Text(
-                                        'Түсү',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Container(
-                                        width: 24,
-                                        height: 24,
-                                        decoration: BoxDecoration(
-                                          color: _selectedColor,
-                                          shape: BoxShape.circle,
-                                          border: _selectedColor == Colors.white
-                                              ? Border.all(color: Colors.grey)
-                                              : Border.all(
-                                                  color: Colors.transparent,
-                                                ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                            const Text(
+                              'Түсү',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: TextFormField(
-                                controller: _cutController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: 'Крой саны',
-                                  prefixIcon: Icon(Icons.content_cut),
+                            Row(
+                              children: [
+                                Text(
+                                  _selectedColorName,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                                validator: (value) =>
-                                    value == null || value.isEmpty
-                                    ? 'Жазыңыз'
-                                    : null,
-                              ),
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 14,
+                                  color: Colors.grey,
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                        const Text(
-                          'Өндүрүш жана детальдар',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 2. Экинчи блок: План штук, Фурнитура, Отправка, Крой кесилген
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        // ignore: deprecated_member_use
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'План штук',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _quantityController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Канча штук чыгат?',
-                            prefixIcon: Icon(Icons.format_list_numbered),
+                          SizedBox(
+                            width: 80,
+                            child: TextFormField(
+                              controller: _quantityController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.right,
+                              decoration: const InputDecoration(
+                                hintText: '140',
+                                isDense: true,
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              validator: (v) => v!.isEmpty ? 'Жазыңыз' : null,
+                            ),
                           ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Милдеттүү толтурулат'
-                              : null,
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Фурнитура:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            _furnituraType,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Фурнитура тандоо радио-баскычтары
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 8,
                         ),
-                        const SizedBox(height: 16),
-                        // Фурнитура түрү
-                        Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0F4F8),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(child: _buildRadioOption('Кнопка')),
+                                Expanded(child: _buildRadioOption('Замок')),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildRadioOption('Башка'),
+                                ), // 3-вариант
+                                Expanded(child: _buildRadioOption('Экөө тең')),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Канча отправка',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            child: TextFormField(
+                              controller: _shipmentController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.right,
+                              decoration: const InputDecoration(
+                                hintText: '120',
+                                isDense: true,
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              validator: (v) => v!.isEmpty ? 'Жазыңыз' : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Крой кесилген дата
+                      InkWell(
+                        onTap: _selectDate,
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
-                            vertical: 8,
+                            vertical: 14,
                           ),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
                             children: [
                               const Text(
-                                'Фурнитура түрү:',
-                                style: TextStyle(fontSize: 16),
+                                'Крой кесилген',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black54,
+                                ),
                               ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                children: [
-                                  ChoiceChip(
-                                    label: const Text('Кнопка'),
-                                    selected: _furnituraType == 'Кнопка',
-                                    onSelected: (val) => setState(
-                                      () => _furnituraType = 'Кнопка',
-                                    ),
-                                  ),
-                                  ChoiceChip(
-                                    label: const Text('Замок'),
-                                    selected: _furnituraType == 'Замок',
-                                    onSelected: (val) => setState(
-                                      () => _furnituraType = 'Замок',
-                                    ),
-                                  ),
-                                  ChoiceChip(
-                                    label: const Text('Экөө тең'),
-                                    selected: _furnituraType == 'Экөө тең',
-                                    onSelected: (val) => setState(
-                                      () => _furnituraType = 'Экөө тең',
-                                    ),
-                                  ),
-                                ],
+                              const Spacer(),
+                              const Icon(
+                                Icons.event_note,
+                                size: 20,
+                                color: Colors.blueGrey,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _dateController.text.isEmpty
+                                    ? 'Дата'
+                                    : _dateController.text,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _shipmentController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Канча отправка болот?',
-                            prefixIcon: Icon(Icons.local_shipping_outlined),
-                          ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Милдеттүү толтурулат'
-                              : null,
-                        ),
-                        const SizedBox(height: 16),
-                        // Крой кесилген дата
-                        TextFormField(
-                          controller: _dateController,
-                          readOnly: true,
-                          onTap: _selectDate,
-                          decoration: const InputDecoration(
-                            labelText: 'Крой кесилген дата',
-                            prefixIcon: Icon(Icons.calendar_today),
-                          ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Милдеттүү толтурулат'
-                              : null,
-                        ),
-                        const SizedBox(height: 32),
-                        // Сактоо баскычы
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _saveForm,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                            ),
-                            child: const Text(
-                              'Сактоо',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        // Тазалоо баскычы
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: _clearForm,
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              side: BorderSide(color: Colors.red.shade400),
-                              foregroundColor: Colors.red.shade600,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.delete_outline),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Тазалоо',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 24),
+
+                // 3. Баскычтар (Buttons section)
+
+                // Сактоо баскычы
+                ElevatedButton.icon(
+                  onPressed: _saveForm,
+                  icon: const Icon(
+                    Icons.save_alt,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  label: const Text(
+                    'Сактоо',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4A89DC),
+                    minimumSize: const Size(double.infinity, 54),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Тазалоо баскычы
+                ElevatedButton.icon(
+                  onPressed: _clearForm,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.grey,
+                    size: 22,
+                  ),
+                  label: const Text(
+                    'Тазалоо',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 54),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Тарыхча баскычы
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            HistoryScreen(userName: widget.userName),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.history_edu,
+                    color: Colors.grey,
+                    size: 24,
+                  ),
+                  label: const Text(
+                    'Тарыхча',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 54),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
