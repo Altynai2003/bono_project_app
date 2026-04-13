@@ -267,12 +267,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. Биринчи блок: Модель аты, Канча крой, Түсү
+                // Бирдиктүү блок (Модель атынан баштап Крой кесилгенге чейин)
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
                         // ignore: deprecated_member_use
@@ -289,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Модель аты',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -303,15 +303,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             vertical: 12,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.grey.shade300),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.grey.shade300),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: const BorderSide(
                               color: Color(0xFF4A89DC),
                             ),
@@ -320,8 +320,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         validator: (v) => v!.isEmpty ? 'Милдеттүү' : null,
                       ),
                       const SizedBox(height: 16),
-                      const Divider(height: 1),
-                      const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -329,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Канча крой',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           SizedBox(
@@ -342,76 +340,59 @@ class _HomeScreenState extends State<HomeScreen> {
                                 hintText: '150',
                                 isDense: true,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                fillColor: Colors.transparent,
+                                filled: false,
                                 contentPadding: EdgeInsets.zero,
                               ),
                               style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.normal,
                               ),
                               validator: (v) => v!.isEmpty ? 'Жазыңыз' : null,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      const Divider(height: 1),
-                      const SizedBox(height: 16),
+                      const Divider(height: 24, color: Color(0xFFF0F0F0)),
                       InkWell(
                         onTap: _showColorPicker,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Түсү',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Түсү',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  _selectedColorName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
+                              Row(
+                                children: [
+                                  Text(
+                                    _selectedColorName,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 14,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // 2. Экинчи блок: План штук, Фурнитура, Отправка, Крой кесилген
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        // ignore: deprecated_member_use
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      const Divider(height: 24, color: Color(0xFFF0F0F0)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -419,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'План штук',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           SizedBox(
@@ -432,20 +413,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 hintText: '140',
                                 isDense: true,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                fillColor: Colors.transparent,
+                                filled: false,
                                 contentPadding: EdgeInsets.zero,
                               ),
                               style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.normal,
                               ),
                               validator: (v) => v!.isEmpty ? 'Жазыңыз' : null,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      const Divider(height: 1),
-                      const SizedBox(height: 16),
+                      const Divider(height: 24, color: Color(0xFFF0F0F0)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -453,14 +436,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Фурнитура:',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           Text(
                             _furnituraType,
                             style: const TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
                         ],
@@ -469,28 +452,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       // Фурнитура тандоо радио-баскычтары
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 8,
-                        ),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0F4F8),
-                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(
+                            0xFFF0F4F8,
+                          ), // Дизайндагы көгүш-боз фон
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Expanded(child: _buildRadioOption('Кнопка')),
+                                Container(
+                                  width: 1,
+                                  height: 20,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(width: 8),
                                 Expanded(child: _buildRadioOption('Замок')),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            const Divider(
+                              height: 16,
+                              color: Colors.transparent,
+                            ),
                             Row(
                               children: [
                                 Expanded(
                                   child: _buildRadioOption('Башка'),
-                                ), // 3-вариант
+                                ), // Сүрөттө кайталанган Замок, коддогу Башканы калтырдым
+                                Container(
+                                  width: 1,
+                                  height: 20,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(width: 8),
                                 Expanded(child: _buildRadioOption('Экөө тең')),
                               ],
                             ),
@@ -498,9 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
-                      const Divider(height: 1),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -509,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Канча отправка',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           SizedBox(
@@ -522,60 +517,60 @@ class _HomeScreenState extends State<HomeScreen> {
                                 hintText: '120',
                                 isDense: true,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                fillColor: Colors.transparent,
+                                filled: false,
                                 contentPadding: EdgeInsets.zero,
                               ),
                               style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.normal,
                               ),
                               validator: (v) => v!.isEmpty ? 'Жазыңыз' : null,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const Divider(height: 24, color: Color(0xFFF0F0F0)),
 
                       // Крой кесилген дата
                       InkWell(
                         onTap: _selectDate,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Крой кесилген',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black54,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Крой кесилген',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.assignment_outlined,
+                                  size: 20,
+                                  color: Colors.grey,
                                 ),
-                              ),
-                              const Spacer(),
-                              const Icon(
-                                Icons.event_note,
-                                size: 20,
-                                color: Colors.blueGrey,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _dateController.text.isEmpty
-                                    ? 'Дата'
-                                    : _dateController.text,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
+                                const SizedBox(width: 6),
+                                Text(
+                                  _dateController.text.isEmpty
+                                      ? 'Дата'
+                                      : _dateController.text,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -587,11 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Сактоо баскычы
                 ElevatedButton.icon(
                   onPressed: _saveForm,
-                  icon: const Icon(
-                    Icons.save_alt,
-                    color: Colors.white,
-                    size: 22,
-                  ),
+                  icon: const Icon(Icons.save, color: Colors.white, size: 22),
                   label: const Text(
                     'Сактоо',
                     style: TextStyle(
@@ -604,7 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: const Color(0xFF4A89DC),
                     minimumSize: const Size(double.infinity, 54),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
@@ -618,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(
                     Icons.delete_outline,
                     color: Colors.grey,
-                    size: 22,
+                    size: 24,
                   ),
                   label: const Text(
                     'Тазалоо',
@@ -632,8 +623,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 54),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
@@ -669,8 +659,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 54),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
