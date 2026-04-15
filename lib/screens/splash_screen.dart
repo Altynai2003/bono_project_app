@@ -13,6 +13,7 @@ class _SplashScreenState extends State<SplashScreen> {
   final TextEditingController _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String _savedName = '';
+  String _selectedRole = 'worker'; // 'worker' же 'chief'
 
   @override
   void initState() {
@@ -23,13 +24,16 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _loadSavedName() async {
     final prefs = await SharedPreferences.getInstance();
     final savedName = prefs.getString('user_name') ?? '';
-    if (savedName.isNotEmpty) {
-      if (mounted) {
-        setState(() {
+    final savedRole = prefs.getString('user_role') ?? 'worker';
+
+    if (mounted) {
+      setState(() {
+        _selectedRole = savedRole;
+        if (savedName.isNotEmpty) {
           _savedName = savedName;
           _nameController.text = savedName;
-        });
-      }
+        }
+      });
     }
   }
 
@@ -37,6 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (_formKey.currentState!.validate()) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_name', _nameController.text.trim());
+      await prefs.setString('user_role', _selectedRole);
 
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -68,6 +73,63 @@ class _SplashScreenState extends State<SplashScreen> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Widget _buildRoleCard({
+    required String role,
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedRole = role;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF4A89DC) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF4A89DC)
+                : const Color(0xFFE2E8F0),
+            width: 2,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    // ignore: deprecated_member_use
+                    color: const Color(0xFF4A89DC).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              size: 40,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : const Color(0xFF334155),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -122,6 +184,30 @@ class _SplashScreenState extends State<SplashScreen> {
                           fontWeight: FontWeight.w800,
                           color: Color(0xFF1E293B),
                         ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Ролду тандоо
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildRoleCard(
+                              role: 'worker',
+                              title: 'Жумушчу',
+                              icon: Icons.precision_manufacturing,
+                              isSelected: _selectedRole == 'worker',
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildRoleCard(
+                              role: 'chief',
+                              title: 'Шеф',
+                              icon: Icons.manage_accounts,
+                              isSelected: _selectedRole == 'chief',
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 32),
 
