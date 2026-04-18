@@ -1,253 +1,397 @@
-// import 'package:flutter/material.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'home_screen.dart';
 
-// class SplashScreen extends StatefulWidget {
-//   const SplashScreen({super.key});
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
 
-//   @override
-//   State<SplashScreen> createState() => _SplashScreenState();
-// }
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
-// class _SplashScreenState extends State<SplashScreen> {
-//   final TextEditingController _nameController = TextEditingController();
-//   final _formKey = GlobalKey<FormState>();
-//   String _savedName = '';
-//   String _selectedRole = 'worker'; // 'worker' же 'chief'
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  final TextEditingController _nameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  String _savedName = '';
+  String _selectedRole = 'worker'; // 'worker' or 'chief'
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _loadSavedName();
-//   }
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
-//   Future<void> _loadSavedName() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final savedName = prefs.getString('user_name') ?? '';
-//     final savedRole = prefs.getString('user_role') ?? 'worker';
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
 
-//     if (mounted) {
-//       setState(() {
-//         _selectedRole = savedRole;
-//         if (savedName.isNotEmpty) {
-//           _savedName = savedName;
-//           _nameController.text = savedName;
-//         }
-//       });
-//     }
-//   }
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
 
-//   Future<void> _continue() async {
-//     if (_formKey.currentState!.validate()) {
-//       final prefs = await SharedPreferences.getInstance();
-//       await prefs.setString('user_name', _nameController.text.trim());
-//       await prefs.setString('user_role', _selectedRole);
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.05),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutQuart),
+    );
 
-//       if (!mounted) return;
-//       Navigator.pushReplacement(
-//         context,
-//         PageRouteBuilder(
-//           pageBuilder: (context, animation, secondaryAnimation) =>
-//               HomeScreen(userName: _nameController.text.trim()),
-//           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-//             const begin = Offset(1.0, 0.0);
-//             const end = Offset.zero;
-//             const curve = Curves.easeInOut;
+    _animationController.forward();
+    _loadSavedName();
+  }
 
-//             var tween = Tween(
-//               begin: begin,
-//               end: end,
-//             ).chain(CurveTween(curve: curve));
+  Future<void> _loadSavedName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedName = prefs.getString('user_name') ?? '';
+    final savedRole = prefs.getString('user_role') ?? 'worker';
 
-//             return SlideTransition(
-//               position: animation.drive(tween),
-//               child: child,
-//             );
-//           },
-//         ),
-//       );
-//     }
-//   }
+    if (mounted) {
+      setState(() {
+        _selectedRole = savedRole;
+        if (savedName.isNotEmpty) {
+          _savedName = savedName;
+          _nameController.text = savedName;
+        }
+      });
+    }
+  }
 
-//   @override
-//   void dispose() {
-//     _nameController.dispose();
-//     super.dispose();
-//   }
+  Future<void> _continue() async {
+    if (_formKey.currentState!.validate()) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', _nameController.text.trim());
+      await prefs.setString('user_role', _selectedRole);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFF4F6F9), // Дизайндагы фон
-//       appBar: AppBar(
-//         // Бош көк тилке (сүрөттөгүдөй)
-//         toolbarHeight: 20,
-//         backgroundColor: const Color(0xFF4A89DC),
-//         elevation: 0,
-//       ),
-//       body: Stack(
-//         children: [
-//           // Астыңкы иллюстрация (Тигүү машинасы жана кайчы)
-//           Positioned(
-//             bottom: -20,
-//             left: -20,
-//             right: -20,
-//             child: Opacity(
-//               opacity: 0.15,
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 crossAxisAlignment: CrossAxisAlignment.end,
-//                 children: [
-//                   Icon(
-//                     Icons.precision_manufacturing,
-//                     size: 250,
-//                     color: const Color(0xFF4A89DC),
-//                   ),
-//                   const SizedBox(width: 20),
-//                   Icon(Icons.cut, size: 120, color: const Color(0xFF4A89DC)),
-//                 ],
-//               ),
-//             ),
-//           ),
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 600),
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              HomeScreen(userName: _nameController.text.trim()),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            var tween = Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).chain(CurveTween(curve: Curves.fastLinearToSlowEaseIn));
 
-//           SafeArea(
-//             child: Center(
-//               child: SingleChildScrollView(
-//                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
-//                 child: Form(
-//                   key: _formKey,
-//                   child: Column(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       // "Кош келиңиз" тексти
-//                       const Text(
-//                         'Кош келиңиз!',
-//                         style: TextStyle(
-//                           fontSize: 28,
-//                           fontWeight: FontWeight.w800,
-//                           color: Color(0xFF1E293B),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 32),
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            );
+          },
+        ),
+      );
+    }
+  }
 
-//                       // Ролду тандоо
-//                       // Row(
-//                       //   children: [
-//                       //     Expanded(
-//                       //       child: _buildRoleCard(
-//                       //         role: 'worker',
-//                       //         title: 'Жумушчу',
-//                       //         icon: Icons.precision_manufacturing,
-//                       //         isSelected: _selectedRole == 'worker',
-//                       //       ),
-//                       //     ),
-//                       //     const SizedBox(width: 16),
-//                       //     Expanded(
-//                       //       child: _buildRoleCard(
-//                       //         role: 'chief',
-//                       //         title: 'Шеф',
-//                       //         icon: Icons.manage_accounts,
-//                       //         isSelected: _selectedRole == 'chief',
-//                       //       ),
-//                       //     ),
-//                       //   ],
-//                       // ),
-//                       const SizedBox(height: 32),
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
 
-//                       // Түшүндүрмө текст
-//                       Text(
-//                         _savedName.isNotEmpty
-//                             ? '$_savedName акыркы колдонуучу'
-//                             : 'Сиздин атыңыз',
-//                         style: const TextStyle(
-//                           fontSize: 14,
-//                           fontWeight: FontWeight.w500,
-//                           color: Color(0xFF64748B),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 12),
+  Widget _buildRoleCard({
+    required String role,
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () => setState(() => _selectedRole = role),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutQuad,
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF4A89DC) : Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF4A89DC) : Colors.grey.shade200,
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? const Color(0xFF4A89DC).withOpacity(0.3)
+                  : Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              size: 40,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-//                       // Аты-жөнүн киргизүүчү инпут (TextField)
-//                       TextFormField(
-//                         controller: _nameController,
-//                         style: const TextStyle(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.w500,
-//                           color: Color(0xFF334155),
-//                         ),
-//                         decoration: InputDecoration(
-//                           hintText: 'Атыңызды жазыңыз',
-//                           contentPadding: const EdgeInsets.symmetric(
-//                             horizontal: 16,
-//                             vertical: 20,
-//                           ),
-//                           prefixIcon: Container(
-//                             margin: const EdgeInsets.only(
-//                               left: 12,
-//                               right: 16,
-//                               top: 4,
-//                               bottom: 4,
-//                             ),
-//                             decoration: BoxDecoration(
-//                               // ignore: deprecated_member_use
-//                               color: const Color(0xFF4A89DC).withOpacity(0.15),
-//                               shape: BoxShape.circle,
-//                             ),
-//                             padding: const EdgeInsets.all(8),
-//                             child: const Icon(
-//                               Icons.person,
-//                               color: Color(0xFF4A89DC),
-//                               size: 24,
-//                             ),
-//                           ),
-//                         ),
-//                         textInputAction: TextInputAction.done,
-//                         onFieldSubmitted: (_) => _continue(),
-//                         validator: (value) {
-//                           if (value == null || value.trim().isEmpty) {
-//                             return 'Сураныч, атыңызды жазыңыз';
-//                           }
-//                           return null;
-//                         },
-//                       ),
-//                       const SizedBox(height: 24),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF1F5F9), // Light grayish-blue
+              Color(0xFFE2E8F0), // Muted light slate
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 28.0),
+              child: Form(
+                key: _formKey,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // App Logo or Avatar
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(28),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF4A89DC).withOpacity(0.15),
+                                  blurRadius: 40,
+                                  offset: const Offset(0, 15),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.styler_rounded,
+                              size: 72,
+                              color: Color(0xFF4A89DC),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
 
-//                       // Баштоо баскычы
-//                       SizedBox(
-//                         width: double.infinity,
-//                         height: 56, // Бийик баскыч
-//                         child: ElevatedButton(
-//                           onPressed: _continue,
-//                           style: ElevatedButton.styleFrom(
-//                             backgroundColor: const Color(
-//                               0xFF4A89DC,
-//                             ), // Көк баскыч
-//                             foregroundColor: Colors.white,
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(
-//                                 12,
-//                               ), // Бурчтары тегеректелген
-//                             ),
-//                             elevation: 0,
-//                           ),
-//                           child: const Text(
-//                             'Баштоо',
-//                             style: TextStyle(
-//                               fontSize: 18,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 64),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+                        // Title text
+                        const Text(
+                          'Кош келиңиз!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF0F172A),
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Тиркемени колдонуу үчүн өзүңүздүн ролуңузду тандап, атыңызды жазыңыз.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF64748B),
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+
+                        // Role selection with beautiful cards
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildRoleCard(
+                                role: 'worker',
+                                title: 'Жумушчу',
+                                icon: Icons.cut_rounded,
+                                isSelected: _selectedRole == 'worker',
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildRoleCard(
+                                role: 'chief',
+                                title: 'Шеф',
+                                icon: Icons.manage_accounts_rounded,
+                                isSelected: _selectedRole == 'chief',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 36),
+
+                        // Label
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+                          child: Text(
+                            _savedName.isNotEmpty
+                                ? 'Сиздин атыңыз (акыркы колдонулган: $_savedName)'
+                                : 'Сиздин атыңыз',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+
+                        // Name input
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blueGrey.withOpacity(0.05),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: TextFormField(
+                            controller: _nameController,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1E293B),
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Марат',
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF94A3B8),
+                                fontWeight: FontWeight.normal,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 22,
+                              ),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Icon(
+                                  Icons.person_pin_rounded,
+                                  color: Color(0xFF4A89DC),
+                                  size: 28,
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade200,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade200,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFF4A89DC),
+                                  width: 2,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _continue(),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Сураныч, атыңызды жазыңыз';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+
+                        // Start Button
+                        SizedBox(
+                          height: 64,
+                          child: ElevatedButton(
+                            onPressed: _continue,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF4A89DC),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              elevation: 10,
+                              shadowColor: const Color(0xFF4A89DC).withOpacity(0.4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Баштоо',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Icon(Icons.arrow_forward_rounded, size: 24),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        
+                        // Small decorative bar at the bottom
+                        Center(
+                          child: Container(
+                            width: 60,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFCBD5E1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
