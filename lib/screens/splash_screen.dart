@@ -32,12 +32,13 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.05),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutQuart),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0.0, 0.05), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutQuart,
+          ),
+        );
 
     _animationController.forward();
     _loadSavedName();
@@ -185,14 +186,16 @@ class _SplashScreenState extends State<SplashScreen>
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF4A89DC).withOpacity(0.15),
+                                  color: const Color(
+                                    0xFF4A89DC,
+                                  ).withOpacity(0.15),
                                   blurRadius: 40,
                                   offset: const Offset(0, 15),
                                 ),
                               ],
                             ),
                             child: const Icon(
-                              Icons.styler_rounded,
+                              Icons.style_rounded,
                               size: 72,
                               color: Color(0xFF4A89DC),
                             ),
@@ -250,7 +253,10 @@ class _SplashScreenState extends State<SplashScreen>
 
                         // Label
                         Padding(
-                          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+                          padding: const EdgeInsets.only(
+                            left: 4.0,
+                            bottom: 8.0,
+                          ),
                           child: Text(
                             _savedName.isNotEmpty
                                 ? 'Сиздин атыңыз (акыркы колдонулган: $_savedName)'
@@ -347,7 +353,9 @@ class _SplashScreenState extends State<SplashScreen>
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               elevation: 10,
-                              shadowColor: const Color(0xFF4A89DC).withOpacity(0.4),
+                              shadowColor: const Color(
+                                0xFF4A89DC,
+                              ).withOpacity(0.4),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 16,
@@ -371,7 +379,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                         const SizedBox(height: 30),
-                        
+
                         // Small decorative bar at the bottom
                         Center(
                           child: Container(
