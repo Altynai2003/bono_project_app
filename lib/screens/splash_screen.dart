@@ -118,7 +118,9 @@ class _SplashScreenState extends State<SplashScreen>
           boxShadow: [
             BoxShadow(
               color: isSelected
+                  // ignore: deprecated_member_use
                   ? const Color(0xFF4A89DC).withOpacity(0.3)
+                  // ignore: deprecated_member_use
                   : Colors.black.withOpacity(0.04),
               blurRadius: 20,
               offset: const Offset(0, 10),
@@ -188,6 +190,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 BoxShadow(
                                   color: const Color(
                                     0xFF4A89DC,
+                                    // ignore: deprecated_member_use
                                   ).withOpacity(0.15),
                                   blurRadius: 40,
                                   offset: const Offset(0, 15),
@@ -276,6 +279,7 @@ class _SplashScreenState extends State<SplashScreen>
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
+                                // ignore: deprecated_member_use
                                 color: Colors.blueGrey.withOpacity(0.05),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
@@ -355,6 +359,7 @@ class _SplashScreenState extends State<SplashScreen>
                               elevation: 10,
                               shadowColor: const Color(
                                 0xFF4A89DC,
+                                // ignore: deprecated_member_use
                               ).withOpacity(0.4),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,

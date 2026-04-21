@@ -99,7 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF4A89DC) : Colors.transparent,
+                              color: isSelected
+                                  ? const Color(0xFF4A89DC)
+                                  : Colors.transparent,
                               width: 2,
                             ),
                           ),
@@ -109,17 +111,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: isSelected
                                 ? Icon(
                                     Icons.check,
-                                    color: color == Colors.white ? Colors.black : Colors.white,
+                                    color: color == Colors.white
+                                        ? Colors.black
+                                        : Colors.white,
                                     size: 24,
                                   )
                                 : (color == Colors.white
-                                    ? Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.grey.shade300),
-                                        ),
-                                      )
-                                    : null),
+                                      ? Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
+                                            ),
+                                          ),
+                                        )
+                                      : null),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -127,8 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           name,
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? const Color(0xFF4A89DC) : Colors.grey.shade600,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? const Color(0xFF4A89DC)
+                                : Colors.grey.shade600,
                           ),
                         ),
                       ],
@@ -155,13 +165,13 @@ class _HomeScreenState extends State<HomeScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF4A89DC), 
-              onPrimary: Colors.white, 
-              onSurface: Colors.black, 
+              primary: Color(0xFF4A89DC),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF4A89DC), 
+                foregroundColor: const Color(0xFF4A89DC),
               ),
             ),
           ),
@@ -201,10 +211,16 @@ class _HomeScreenState extends State<HomeScreen> {
         bool? proceed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             title: Row(
               children: const [
-                Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.orange,
+                  size: 28,
+                ),
                 SizedBox(width: 8),
                 Text('Эскертүү!'),
               ],
@@ -216,15 +232,26 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Жок, оңдойм', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Жок, оңдойм',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx, true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF4A89DC),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Ооба, уланталы', style: TextStyle(color: Colors.white)),
+                child: const Text(
+                  'Ооба, уланталы',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -232,7 +259,8 @@ class _HomeScreenState extends State<HomeScreen> {
         if (proceed != true) return;
       }
 
-      final colorHex = '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
+      final colorHex =
+          '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0')}';
 
       final order = OrderModel(
         userName: widget.userName,
@@ -264,7 +292,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           backgroundColor: const Color(0xFF2ECA7F),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.all(16),
           elevation: 4,
           duration: const Duration(seconds: 3),
@@ -284,7 +314,11 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A89DC).withOpacity(0.1) : Colors.transparent,
+          // ignore: deprecated_member_use
+          color: isSelected
+              // ignore: deprecated_member_use
+              ? const Color(0xFF4A89DC).withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? const Color(0xFF4A89DC) : Colors.grey.shade300,
@@ -296,8 +330,12 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: isSelected ? const Color(0xFF4A89DC) : Colors.grey.shade400,
+              isSelected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              color: isSelected
+                  ? const Color(0xFF4A89DC)
+                  : Colors.grey.shade400,
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -306,7 +344,9 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? const Color(0xFF4A89DC) : Colors.grey.shade700,
+                color: isSelected
+                    ? const Color(0xFF4A89DC)
+                    : Colors.grey.shade700,
               ),
             ),
           ],
@@ -342,6 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: const Color(0xFF4A89DC).withOpacity(0.06),
             blurRadius: 15,
             spreadRadius: 2,
@@ -383,11 +424,21 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.normal),
-              prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF4A89DC).withOpacity(0.6)) : null,
+              hintStyle: TextStyle(
+                color: Colors.grey.shade400,
+                fontWeight: FontWeight.normal,
+              ),
+              // ignore: deprecated_member_use
+              prefixIcon: icon != null
+                  // ignore: deprecated_member_use
+                  ? Icon(icon, color: const Color(0xFF4A89DC).withOpacity(0.6))
+                  : null,
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -398,14 +449,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFF4A89DC), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFF4A89DC),
+                  width: 2,
+                ),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+                borderSide: const BorderSide(
+                  color: Colors.redAccent,
+                  width: 1.5,
+                ),
               ),
             ),
-            validator: isRequired ? (v) => v!.isEmpty ? 'Бул талааны толтуруу милдеттүү' : null : null,
+            validator: isRequired
+                ? (v) => v!.isEmpty ? 'Бул талааны толтуруу милдеттүү' : null
+                : null,
           ),
         ],
       ),
@@ -437,6 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             boxShadow: [
               BoxShadow(
+                // ignore: deprecated_member_use
                 color: const Color(0xFF4A89DC).withOpacity(0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
@@ -447,7 +507,11 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 22),
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
             title: Column(
@@ -456,7 +520,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const Text(
                   'Куш келиңиз',
-                  style: TextStyle(fontSize: 12, color: Colors.white70, fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
                 Text(
                   widget.userName,
@@ -482,7 +550,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white54, width: 2),
                       ),
-                      child: const Icon(Icons.person, color: Colors.white, size: 22),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                     onPressed: () {},
                   ),
@@ -503,7 +575,10 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // 1. Негизги маалымат (Basic info)
-                _buildSectionTitle('Негизги маалымат', Icons.info_outline_rounded),
+                _buildSectionTitle(
+                  'Негизги маалымат',
+                  Icons.info_outline_rounded,
+                ),
                 _buildCard(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -519,7 +594,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 8),
 
                 // 2. Сандар (Quantities)
-                _buildSectionTitle('Өлчөмдөр жана Сандар', Icons.format_list_numbered_rounded),
+                _buildSectionTitle(
+                  'Өлчөмдөр жана Сандар',
+                  Icons.format_list_numbered_rounded,
+                ),
                 _buildCard(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -585,7 +663,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: _showColorPicker,
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
@@ -600,7 +681,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ? Container(
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            border: Border.all(color: Colors.grey.shade300),
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
+                                            ),
                                           ),
                                         )
                                       : null,
@@ -616,12 +699,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                 ),
-                                const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
                               ],
                             ),
                           ),
                         ),
-                        
+
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 20),
                           child: Divider(height: 1),
@@ -675,7 +762,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: _selectDate,
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
@@ -683,11 +773,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.today_rounded, color: Color(0xFF4A89DC), size: 24),
+                                const Icon(
+                                  Icons.today_rounded,
+                                  color: Color(0xFF4A89DC),
+                                  size: 24,
+                                ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    _dateController.text.isEmpty ? 'Датаны тандаңыз' : _dateController.text,
+                                    _dateController.text.isEmpty
+                                        ? 'Датаны тандаңыз'
+                                        : _dateController.text,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -695,7 +791,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                 ),
-                                const Icon(Icons.edit_calendar_rounded, size: 20, color: Colors.grey),
+                                const Icon(
+                                  Icons.edit_calendar_rounded,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
                               ],
                             ),
                           ),
@@ -713,16 +813,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: _saveForm,
-                        icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
+                        icon: const Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.white,
+                        ),
                         label: const Text(
                           'Сактоо',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF4A89DC),
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           elevation: 4,
+                          // ignore: deprecated_member_use
                           shadowColor: const Color(0xFF4A89DC).withOpacity(0.5),
                         ),
                       ),
@@ -736,16 +846,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       flex: 1,
                       child: OutlinedButton.icon(
                         onPressed: _clearForm,
-                        icon: Icon(Icons.refresh_rounded, color: Colors.grey.shade600, size: 20),
+                        icon: Icon(
+                          Icons.refresh_rounded,
+                          color: Colors.grey.shade600,
+                          size: 20,
+                        ),
                         label: Text(
                           'Тазалоо',
-                          style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor: Colors.white,
-                          side: BorderSide(color: Colors.grey.shade300, width: 1.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          side: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
                     ),
@@ -757,26 +879,43 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => HistoryScreen(userName: widget.userName),
+                              builder: (_) =>
+                                  HistoryScreen(userName: widget.userName),
                             ),
                           );
                         },
-                        icon: const Icon(Icons.history_rounded, color: Color(0xFF4A89DC), size: 20),
+                        icon: const Icon(
+                          Icons.history_rounded,
+                          color: Color(0xFF4A89DC),
+                          size: 20,
+                        ),
                         label: const Text(
                           'Тарыхча',
-                          style: TextStyle(color: Color(0xFF4A89DC), fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Color(0xFF4A89DC),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFF4A89DC).withOpacity(0.05),
-                          side: const BorderSide(color: Color(0xFF4A89DC), width: 1.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          // ignore: deprecated_member_use
+                          backgroundColor: const Color(
+                            0xFF4A89DC,
+                            // ignore: deprecated_member_use
+                          ).withOpacity(0.05),
+                          side: const BorderSide(
+                            color: Color(0xFF4A89DC),
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
               ],
             ),
