@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/order_model.dart';
-import '../db/database_helper.dart';
 
 class HistoryScreen extends StatefulWidget {
   final String userName;
@@ -665,4 +664,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ],
     );
   }
+}
+
+class DatabaseHelper {
+  static Null get instance => null;
 }
